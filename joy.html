@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>Joy</title>
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    #joystick {
+      border: 1px solid #9C9898;
+    }
+  </style>
+  <script src="./src/joy.js"></script>
+  <script src="./src/eventemitter2.min.js"></script>
+  <script src="./src/roslib.js"></script>
+  <script src="./src/topic.js"></script>
+</head>
+
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false" onbeforecopy="return false"
+  oncopy=document.selection.empty() onselect=document.selection.empty()>
+  <!--onselectstart='return false'是禁止选中-->
+  <div id="joyDiv" style="width:295px;height:295px;"></div>
+  <div hidden="hidden">
+    X位置：<input id="posizioneX" type="text" readonly="readonly" /></br>
+    Y位置：<input id="posizioneY" type="text" readonly="readonly" /></br>
+    方向：<input id="direzione" type="text" readonly="readonly" /></br>
+    X :<input id="X" type="text" readonly="readonly" /></br>
+    Y :<input id="Y" type="text" readonly="readonly" />
+  </div>
+  <script type="text/javascript">
+    // Create JoyStick object into the DIV 'joyDiv'
+    var joy = new JoyStick('joyDiv');
+    var inputPosX = document.getElementById("posizioneX");
+    var inputPosY = document.getElementById("posizioneY");
+    var direzione = document.getElementById("direzione");
+    var x = document.getElementById("X");//摇杆的x y坐标
+    var y = document.getElementById("Y");
+    setInterval(function () { inputPosX.value = joy.GetPosX(); }, 50);//定时50ms执行一次任务
+    setInterval(function () { inputPosY.value = joy.GetPosY(); }, 50);
+    setInterval(function () { direzione.value = joy.GetDir(); }, 50);
+    setInterval(function () { x.value = joy.GetX(); }, 50);//更新摇杆所在x y轴坐标
+    setInterval(function () { y.value = joy.GetY(); }, 50);
+    setInterval(function () {
+      if ((parseFloat(y.value) / 500) != 0 || -(parseFloat(x.value)) != 0) {//上次数据不为零的时候使能
+        move((parseFloat(y.value) / 500), -(parseFloat(x.value)) / 100);
+      }
+    }, 50);//摇杆控制，定时50ms，move(x,z)，因此y的值当作x，x的负值当作z
+
+  </script>
+</body>
+
+</html>

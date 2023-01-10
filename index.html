@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <link href="./css/css.css" rel="stylesheet" type="text/css" />
+  <script src="./src/easeljs.min.js"></script>
+  <script src="./src/eventemitter2.min.js"></script>
+  <script src="./src/roslib.js"></script>
+  <script src="./src/ros2d.js"></script>
+  <script src="./src/nav2d.js"></script>
+  <script src="./src/navigator/ImageMapClientNav.js"></script>
+  <script src="./src/navigator/Navigator.js"></script>
+  <script src="./src/navigator/OccupancyGridClientNav.js"></script>
+  <script src="./src/topic.js"></script>
+  <script src="./src/nav.js"></script>
+</head>
+
+<body onload="init(),sub_car_state(),sub_robot_pose(),robot_pose()" oncontextmenu="return false"
+  onselectstart="return false" ondragstart="return false" onbeforecopy="return false" oncopy=document.selection.empty()
+  onselect=document.selection.empty()>
+  <h1>ROS Web控制端测试</h1>
+  <div id="nav" class="divcss4">
+  </div>
+  <!--按钮控制4方向-->
+  <div class="divcss3">
+    <div style="width: 100%; height: 33%;"><button onclick="front()" style="width: 50%;">前进</button><button
+        onclick="back()" style="width: 50%;">后退</button></div>
+    <div style="width: 100%; height: 33%;"><button onclick="left()" style="width: 50%;">左转</button><button
+        onclick="right()" style="width: 50%;">右转</button>
+    </div>
+    <div><button onclick="stop()" style="width: 100%;">停止</button></div>
+  </div>
+  <!--小车简易状态-->
+  <div class="divcss1">
+    <p><strong>状态</strong>
+      <button onclick="sub_car_state()" hidden="hidden">读取状态</button>
+      <button onclick="unsub_car_state()" hidden="hidden">取消读取</button>
+    </p>
+    <p id="car_state_voltage">电压：</p>
+    <p id="car_state_current">充电电流：</p>
+    <p id="car_state_charge_state">进桩状态：</p>
+  </div>
+  <!--命令发送区-->
+  <div class="divcss2">
+    <p></p>
+    <div style="width: 98.5%; height: 10%; position: absolute; left: 0;top: 6%;">
+      <input id="control_cmd"><button onclick="pub_cmd()">发送命令</button>
+    </div>
+    <p></p>
+    <div style="width: 98.5%; height: 60%; position: absolute; left: 0;top: 29%;">
+      <button onclick="pub_cmd2('ReCharge')">进桩</button>
+      <button onclick="pub_cmd2('move_base_start')">重启导航</button>
+      <button onclick="pub_cmd2('gmapping_start')">启动建图</button>
+      <button onclick="pub_cmd2('gmapping_stop')">停止建图</button>
+      <button onclick="pub_cmd2('move_base_stop')">关闭导航</button>
+      <button onclick="pub_cmd2('disReCharge')">终止进桩</button>
+    </div>
+    <P></P>
+    <div style="border: 2px solid red; width: 98.5%; height: 30%; position: absolute; left: 0;top: 61%;">
+      <div><input id="map_name" value="map"></div>
+      <div><button onclick="save_map()">保存地图</button><button onclick="load_map()">加载</button><button
+          onclick="delete_map()">删除地图</button></div>
+    </div>
+  </div>
+  <!--摇杆控制-->
+  <div class="divcss5"><iframe src="./joy.html" width="100%" height="100%"></iframe></div>
+  <!--目标点设置-->
+  <div class="divcss6">
+    <p></p>
+    <button onclick="setpoint('point1')">保存为1号点</button>
+    <button onclick="setpoint('point2')">保存为2号点</button>
+    <button onclick="setpoint('point3')">保存为3号点</button>
+    <button onclick="setpoint('point4')">保存为4号点</button>
+    <button onclick="setpoint('point5')">保存为5号点</button>
+    <P></P>
+    <button onclick="cancel_goal_pub()">取消到点</button>
+    <!--go(x,y,oz,ow)，在其中传入位置坐标即可实现定点导航-->
+    <!--<button onclick="go(0,0,0,0)">前往1号点*</button>
+    <button onclick="go(0,0,0,0)">前往2号点*</button>
+    <button onclick="go(0,0,0,0)">前往3号点*</button>
+    <button onclick="go(0,0,0,0)">前往4号点*</button>
+    <button onclick="go(0,0,0,0)">前往5号点*</button>-->
+    <button onclick="go2('point1')">前往1号点</button>
+    <button onclick="go2('point2')">前往2号点</button>
+    <button onclick="go2('point3')">前往3号点</button>
+    <button onclick="go2('point4')">前往4号点</button>
+    <button onclick="go2('point5')">前往5号点</button>
+  </div>
+  <!--位置信息-->
+  <div class="divcss8" hidden="hidden">
+    <p>
+      <strong>位置信息</strong>
+      <button onclick="sub_robot_pose()" hidden="hidden">获取当前位置信息</button>
+      <button onclick="unsub_robot_pose()" hidden="hidden">取消位置监听</button>
+    </p>
+    <p id="positionx">position x:</p>
+    <p id="positiony">position y:</p>
+    <p id="positionz">position z:</p>
+    <p id="orientationx">orientation x:</p>
+    <p id="orientationy">orientation y:</p>
+    <p id="orientationw">orientation w:</p>
+    <p id="orientationz">orientation z:</p>
+  </div>
+  <!--设置初始位置-->
+  <div class="divcss7">
+    <button onclick="robot_pose()" style="width: 100%;height: 100%;"><strong>设置初始位置</strong></button>
+  </div>
+  <div class="divcss9"><button onclick="stop()"
+      style="width: 100%;height: 100%;color: rgb(255, 0, 0);"><strong>急停</strong></button>
+  </div>
+</body>
+
+</html>
